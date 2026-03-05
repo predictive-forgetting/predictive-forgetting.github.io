@@ -213,6 +213,15 @@ body::before {
   opacity: 0; animation: fadeUp .8s .65s forwards;
 }
 .hero-authors strong { color: var(--text-secondary); font-weight: 500; }
+.author-link {
+  color: inherit; text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s, color .2s;
+}
+.author-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent-dim);
+}
 .hero-badges {
   display: flex; gap: .9rem; justify-content: center; flex-wrap: wrap;
   opacity: 0; animation: fadeUp .8s .8s forwards;
@@ -389,6 +398,7 @@ section { padding: var(--section-gap) 0; position: relative; z-index: 1; }
   width: 100%; margin-top: 2.4rem;
   border-collapse: separate; border-spacing: 0;
   border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  table-layout: fixed;
   transition: border-color var(--ease);
 }
 .predictions-table thead th {
@@ -400,6 +410,11 @@ section { padding: var(--section-gap) 0; position: relative; z-index: 1; }
   border-bottom: 1px solid var(--border);
   transition: background var(--ease), border-color var(--ease), color var(--ease);
 }
+/* Column widths */
+.predictions-table thead th:nth-child(1) { width: 18%; }
+.predictions-table thead th:nth-child(2) { width: 40%; }
+.predictions-table thead th:nth-child(3) { width: 24%; }
+.predictions-table thead th:nth-child(4) { width: 18%; }
 .predictions-table tbody td {
   padding: .85rem 1.1rem;
   font-size: .86rem; color: var(--text-secondary);
@@ -407,10 +422,10 @@ section { padding: var(--section-gap) 0; position: relative; z-index: 1; }
   vertical-align: top;
   transition: color var(--ease), border-color var(--ease);
 }
-.predictions-table tbody tr:last-child td { border-bottom: none; }
-.predictions-table tbody tr:hover { background: var(--bg-card); }
+.predictions-table tbody tr.pred-row:last-of-type td,
+.predictions-table tbody tr.pred-row:last-of-type + tr.pred-detail td { border-bottom: none; }
 .predictions-table tbody td:first-child {
-  font-weight: 500; color: var(--text-primary); white-space: nowrap;
+  font-weight: 500; color: var(--text-primary);
 }
 .status-badge {
   display: inline-block; padding: .15rem .55rem;
@@ -419,6 +434,46 @@ section { padding: var(--section-gap) 0; position: relative; z-index: 1; }
 .status-grounding { background: rgba(42,143,125,.08); color: var(--accent-teal); }
 .status-unification { background: rgba(58,111,170,.08); color: var(--accent-blue); }
 .status-prediction { background: var(--accent-glow); color: var(--accent); }
+
+/* Clickable prediction rows */
+tr.pred-row { cursor: pointer; transition: background .15s; user-select: none; }
+tr.pred-row:hover { background: var(--bg-card); }
+
+/* Expandable detail row */
+tr.pred-detail td {
+  padding: 0 !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  background: var(--bg-card);
+  transition: background var(--ease);
+}
+.pred-detail-inner {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .4s cubic-bezier(.4,0,.2,1), padding .4s;
+  padding: 0 1.1rem;
+}
+tr.pred-detail.open .pred-detail-inner {
+  max-height: 400px;
+  padding: .7rem 1.1rem 1rem 1.1rem;
+}
+.pred-detail-inner p {
+  font-size: .84rem; line-height: 1.72; color: var(--text-secondary);
+  margin-bottom: .45rem;
+}
+.pred-refs {
+  font-size: .75rem; color: var(--text-muted); line-height: 1.6;
+  font-style: italic;
+}
+.pred-refs a { color: var(--accent-dim); text-decoration: none; }
+.pred-refs a:hover { color: var(--accent); text-decoration: underline; }
+
+/* ===== THEME-AWARE FIGURES ===== */
+/* Use class fig-light / fig-dark on <img> elements for theme-switched figures.
+   If only one img is present (no class), it displays in both themes. */
+.fig-container img.fig-light { display: block; }
+.fig-container img.fig-dark { display: none; }
+[data-theme="dark"] .fig-container img.fig-light { display: none; }
+[data-theme="dark"] .fig-container img.fig-dark { display: block; }
 
 /* ===== CITATION ===== */
 .citation-section { padding: 4rem 0 6rem; }
@@ -477,7 +532,6 @@ footer a:hover { color: var(--accent); }
   .topnav-links { gap: .6rem; }
   .topnav-links a:not(.btn-sm):not(.theme-toggle) { display: none; }
   .predictions-table { font-size: .78rem; }
-  .predictions-table tbody td:first-child { white-space: normal; }
 }
 </style>
 </head>
@@ -503,17 +557,17 @@ footer a:hover { color: var(--accent); }
 
 <!-- HERO -->
 <header class="hero container">
-  <div class="hero-overline">Fountas et al. · 2025</div>
+  <div class="hero-overline">Fountas et al. · 2026</div>
   <h1>Why the Brain Consolidates: <em>Predictive Forgetting</em> for Optimal Generalisation</h1>
   <p class="hero-subtitle">
     We show that memory consolidation implements <strong>conditional information compression</strong> — the iterative elimination of sensory information that does not predict future outcomes — provably tightening generalisation bounds.
   </p>
   <p class="hero-authors">
-    <strong>Zafeirios Fountas</strong><sup>1*</sup>,
-    Adnan Oomerjee<sup>1,2</sup>,
-    Haitham Bou-Ammar<sup>1,2</sup>,
-    Jun Wang<sup>2</sup>,
-    <strong>Neil Burgess</strong><sup>3,4</sup><br>
+    <strong><a href="https://zfountas.com/" target="_blank" class="author-link">Zafeirios Fountas</a></strong><sup>1*</sup>,
+    <a href="https://scholar.google.com/citations?user=0kdNPmAAAAAJ&hl=en" target="_blank" class="author-link">Adnan Oomerjee</a><sup>1,2</sup>,
+    <a href="https://scholar.google.com/citations?user=AE5suDoAAAAJ&hl=en" target="_blank" class="author-link">Haitham Bou-Ammar</a><sup>1,2</sup>,
+    <a href="http://www0.cs.ucl.ac.uk/staff/jun.wang/" target="_blank" class="author-link">Jun Wang</a><sup>2</sup>,
+    <strong><a href="https://scholar.google.com/citations?user=RjGAaJ8AAAAJ&hl=en" target="_blank" class="author-link">Neil Burgess</a></strong><sup>3,4</sup><br>
     <span style="font-size:.78rem">
       <sup>1</sup>Huawei Noah's Ark Lab &nbsp;
       <sup>2</sup>UCL Computer Science &nbsp;
@@ -557,6 +611,11 @@ footer a:hover { color: var(--accent); }
       </div>
       <div>
         <div class="fig-container">
+          <!-- THEME-AWARE FIGURES: When you have light/dark variants, use:
+               <img class="fig-light" src="fig1-light.svg" alt="...">
+               <img class="fig-dark" src="fig1-dark.svg" alt="...">
+               CSS automatically shows the correct one per theme.
+               For now, a single img (no class) displays in both themes. -->
           <img src="fig1.png" alt="Figure 1: Consolidation as predictive forgetting">
         </div>
         <p class="fig-caption">Figure 1 — Consolidation progressively discards noise (green) while sharpening category-predictive features (red, blue).</p>
@@ -668,56 +727,105 @@ footer a:hover { color: var(--accent); }
         <tr><th>Mechanism</th><th>Neural Signature</th><th>Methods</th><th>Status</th></tr>
       </thead>
       <tbody>
-        <tr>
+        <!-- 1. Temporal Compression -->
+        <tr class="pred-row" onclick="togglePred(this)">
           <td>Temporal Compression</td>
           <td>Manifold radius/dimension reduction; increased within-category similarity</td>
           <td>fMRI RSA, Manifold Capacity Analysis</td>
           <td><span class="status-badge status-grounding">Grounding</span></td>
         </tr>
-        <tr>
+        <tr class="pred-detail"><td colspan="4"><div class="pred-detail-inner">
+          <p>If consolidation implements predictive forgetting, neural representations must become progressively more compressed over time. Geometrically, this corresponds to a reduction in the radius and intrinsic dimension of the neural manifold. Pattern similarity within task-relevant categories should increase, whilst between-category distinctions are sharpened. This reinterprets the "semanticisation" observed in longitudinal fMRI — not as abstract knowledge accumulation, but as the active pruning of manifold variance orthogonal to the task.</p>
+          <div class="pred-refs">Chung et al. (2018) <em>Phys Rev X</em>; Schapiro et al. (2017) <em>Sci Rep</em></div>
+        </div></td></tr>
+
+        <!-- 2. Sleep Acceleration -->
+        <tr class="pred-row" onclick="togglePred(this)">
           <td>Sleep Acceleration</td>
           <td>$I(X; Z)$ compression accelerates during sleep vs. wake</td>
           <td>Sleep manipulation, fMRI reactivation</td>
           <td><span class="status-badge status-grounding">Grounding</span></td>
         </tr>
-        <tr>
+        <tr class="pred-detail"><td colspan="4"><div class="pred-detail-inner">
+          <p>If offline consolidation is computationally necessary, sleep should accelerate representational change relative to equivalent wake intervals. Measuring representational geometry immediately post-encoding vs. post-sleep should reveal greater compression (manifold contraction) following sleep. This effect has been behaviourally indexed as "gist extraction" and "relational integration", but our framework offers a precise neural definition: sleep replay selectively samples traces to minimise description length.</p>
+          <div class="pred-refs">Igloi et al. (2015) <em>Nat Commun</em>; Ellenbogen et al. (2007) <em>Curr Biol</em></div>
+        </div></td></tr>
+
+        <!-- 3. Generalisation Link -->
+        <tr class="pred-row" onclick="togglePred(this)">
           <td>Generalisation Link</td>
           <td>Neural compression predicts out-of-distribution performance</td>
           <td>Behavioural transfer tests</td>
           <td><span class="status-badge status-grounding">Grounding</span></td>
         </tr>
-        <tr>
+        <tr class="pred-detail"><td colspan="4"><div class="pred-detail-inner">
+          <p>Across individuals and time points, greater neural compression should predict better generalisation to novel exemplars. This provides the critical link between our information-theoretic framework and behavioural outcomes: if reducing $I(X; Z \mid Y)$ tightens generalisation bounds, then participants exhibiting stronger compression should show superior out-of-distribution performance. Importantly, this relationship is selective: compression of information orthogonal to task demands improves generalisation, whereas compression of task-relevant structure impairs it.</p>
+          <div class="pred-refs">Tompary &amp; Davachi (2017) <em>J Neurosci</em>; Wimmer &amp; Shohamy (2012) <em>Nat Neurosci</em></div>
+        </div></td></tr>
+
+        <!-- 4. Readout Sharpening -->
+        <tr class="pred-row" onclick="togglePred(this)">
           <td>Readout Sharpening</td>
           <td>Increased SNR in memory traces; synaptic down-selection</td>
           <td>Longitudinal 7T fMRI, electrophysiology</td>
           <td><span class="status-badge status-grounding">Grounding</span></td>
         </tr>
-        <tr>
+        <tr class="pred-detail"><td colspan="4"><div class="pred-detail-inner">
+          <p>Consolidation optimises the decision boundaries of downstream readouts. This mechanism explains "trace sharpening" recently observed in high-field fMRI, where the signal-to-noise ratio of memory representations increases over weeks. Our model interprets this not as passive decay, but as an active process driven by synaptic down-selection: synapses encoding non-predictive nuisance variables are pruned during sleep-dependent renormalisation, effectively implementing the information bottleneck.</p>
+          <div class="pred-refs">Vanasse et al. (2022) <em>Neuroimage</em>; de Vivo et al. (2017) <em>Science</em></div>
+        </div></td></tr>
+
+        <!-- 5. Predictive Codes -->
+        <tr class="pred-row" onclick="togglePred(this)">
           <td>Predictive Codes</td>
           <td>Shift from retrospective to prospective successor representations</td>
           <td>Sequential learning tasks</td>
           <td><span class="status-badge status-unification">Unification</span></td>
         </tr>
-        <tr>
+        <tr class="pred-detail"><td colspan="4"><div class="pred-detail-inner">
+          <p>In sequential domains, minimising $I(X; Z \mid Y)$ naturally leads to representations that encode expected future state occupancy rather than immediate sensory features. SR-like codes in hippocampal CA1 may reflect the earliest stages of this compression, while the eigenvectors of the SR correspond to grid-like structural codes in entorhinal and prefrontal cortices. We predict that consolidation drives a qualitative shift from environment-specific, place-like representations toward structural, environment-general codes over days to weeks.</p>
+          <div class="pred-refs">Stachenfeld et al. (2017) <em>Nat Neurosci</em>; Whittington et al. (2020) <em>Cell</em>; Bennett et al. (2025) <em>bioRxiv</em></div>
+        </div></td></tr>
+
+        <!-- 6. Hierarchical Gradients -->
+        <tr class="pred-row" onclick="togglePred(this)">
           <td>Hierarchical Gradients</td>
           <td>Compression magnitude scales with cortical hierarchy</td>
           <td>Multi-region fMRI</td>
           <td><span class="status-badge status-prediction">Prediction</span></td>
         </tr>
-        <tr>
+        <tr class="pred-detail"><td colspan="4"><div class="pred-detail-inner">
+          <p>Consolidation-related compression should vary systematically across the cortical hierarchy. Early sensory regions, which must preserve input fidelity for immediate perceptual demands, should exhibit minimal compression. Higher associative cortices (prefrontal, parietal, entorhinal) that extract abstract task structure should show maximal compression. This predicts a spatial gradient in the magnitude of $I(X; Z \mid Y)$ reduction, consistent with initial evidence of "task-tailored" geometry in prefrontal cortex.</p>
+          <div class="pred-refs">Bhandari et al. (2025) <em>bioRxiv</em>; Krenz et al. (2023) <em>PNAS</em></div>
+        </div></td></tr>
+
+        <!-- 7. Reconsolidation -->
+        <tr class="pred-row" onclick="togglePred(this)">
           <td>Reconsolidation</td>
           <td>Retrieval induces further compression of the trace</td>
           <td>Retrieval-practice paradigms</td>
           <td><span class="status-badge status-prediction">Prediction</span></td>
         </tr>
-        <tr>
+        <tr class="pred-detail"><td colspan="4"><div class="pred-detail-inner">
+          <p>Each memory retrieval event should trigger further compression. Our framework predicts that the inverse loop (recall followed by re-encoding) implements an additional consolidation step. Thus, retrieved memories should show greater compression than non-retrieved memories matched for age. This is context-dependent: when task demands require preservation of episodic detail, retrieval-induced compression is suppressed; when abstraction is required, retrieval accelerates the collapse of nuisance dimensions.</p>
+          <div class="pred-refs">Hahamy et al. (2023) <em>Science</em>; Bridge &amp; Voss (2014) <em>J Neurosci</em></div>
+        </div></td></tr>
+
+        <!-- 8. Structure / Content Split -->
+        <tr class="pred-row" onclick="togglePred(this)">
           <td>Structure / Content Split</td>
           <td>Temporal keys stable, sensory values compressed</td>
           <td>LLM analysis, HC subfield recording</td>
           <td><span class="status-badge status-prediction">Prediction</span></td>
         </tr>
+        <tr class="pred-detail"><td colspan="4"><div class="pred-detail-inner">
+          <p>Based on our LLM results (Fig. 5c–d), we predict a physiological dissociation between addressing and content. Neural populations encoding temporal or contextual indices (Keys) — potentially in CA3 or superficial cortical layers — should exhibit high stability during consolidation to preserve structural scaffolding. In contrast, populations encoding sensory content (Values) — such as those in CA1 or deep cortical outputs — should undergo more aggressive compression.</p>
+          <div class="pred-refs">Gershman et al. (2025) <em>Trends Cogn Sci</em>; see Fig. 5c–d in this paper</div>
+        </div></td></tr>
       </tbody>
     </table>
+
+    <p style="font-size:.78rem; color:var(--text-muted); margin-top:.8rem; text-align:center; font-style:italic;">Click any row to expand details and references.</p>
   </div>
 </section>
 
@@ -728,13 +836,13 @@ footer a:hover { color: var(--accent); }
     <h2 class="section-title">Cite this work</h2>
     <div class="cite-box">
       <button class="cite-copy" onclick="copyBib()">Copy BibTeX</button>
-      <pre id="bibtex">@article{fountas2025predictiveforgetting,
+      <pre id="bibtex">@article{fountas2026predictiveforgetting,
   title   = {Why the Brain Consolidates: Predictive Forgetting
              for Optimal Generalisation},
   author  = {Fountas, Zafeirios and Oomerjee, Adnan and
              Bou-Ammar, Haitham and Wang, Jun and Burgess, Neil},
   journal = {arXiv preprint arXiv:XXXX.XXXXX},
-  year    = {2025}
+  year    = {2026}
 }</pre>
     </div>
   </div>
@@ -746,7 +854,7 @@ footer a:hover { color: var(--accent); }
       Predictive Forgetting ·
       <a href="https://arxiv.org/abs/XXXX.XXXXX" target="_blank">arXiv</a> ·
       <a href="https://github.com/zfountas/predictive-forgetting" target="_blank">GitHub</a> ·
-      <a href="https://zfrn.org" target="_blank">Zafeirios Fountas</a>
+      <a href="https://zfountas.com/" target="_blank">Zafeirios Fountas</a>
     </p>
   </div>
 </footer>
@@ -785,6 +893,22 @@ function copyBib() {
     btn.textContent = 'Copied!';
     setTimeout(() => btn.textContent = 'Copy BibTeX', 2000);
   });
+}
+
+// Prediction row expand/collapse
+function togglePred(row) {
+  const detail = row.nextElementSibling;
+  const wasOpen = row.classList.contains('open');
+  // Close all
+  document.querySelectorAll('tr.pred-row.open').forEach(r => {
+    r.classList.remove('open');
+    r.nextElementSibling.classList.remove('open');
+  });
+  // Toggle clicked (if it wasn't already open)
+  if (!wasOpen) {
+    row.classList.add('open');
+    detail.classList.add('open');
+  }
 }
 </script>
 
