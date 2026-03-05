@@ -289,10 +289,16 @@ section { padding: var(--section-gap) 0; position: relative; z-index: 1; }
 .eq-note strong { color: var(--accent); font-weight: 500; }
 .fig-container {
   border-radius: var(--radius); overflow: hidden;
-  border: 1px solid var(--fig-border); background: var(--fig-bg);
+  border: 1px solid var(--fig-border); background: transparent;
   box-shadow: var(--shadow-sm);
   transition: border-color var(--ease), box-shadow var(--ease);
 }
+/* Optional: add fig-padded class for figures that need a white inset background */
+.fig-container.fig-padded { background: var(--fig-bg); padding: 1rem; }
+/* Size control: add fig-sm, fig-md, or fig-lg to the container, or set max-width inline */
+.fig-container.fig-sm { max-width: 360px; }
+.fig-container.fig-md { max-width: 500px; }
+.fig-container.fig-lg { max-width: 700px; }
 .fig-caption {
   font-size: .78rem; color: var(--text-muted);
   margin-top: .55rem; font-style: italic;
@@ -611,12 +617,21 @@ footer a:hover { color: var(--accent); }
       </div>
       <div>
         <div class="fig-container">
+          <!-- FIGURE OPTIONS:
+               Background: default is transparent. Add class "fig-padded" for white inset.
+               Size: add class "fig-sm" (360px), "fig-md" (500px), "fig-lg" (700px),
+                     or use inline style: style="max-width: 450px"
+               Border: remove border with style="border:none; box-shadow:none"
+               Theme variants: use <img class="fig-light"> and <img class="fig-dark">
+          -->
           <!-- THEME-AWARE FIGURES: When you have light/dark variants, use:
-               <img class="fig-light" src="fig1-light.svg" alt="...">
-               <img class="fig-dark" src="fig1-dark.svg" alt="...">
                CSS automatically shows the correct one per theme.
-               For now, a single img (no class) displays in both themes. -->
-          <img src="fig1.png" alt="Figure 1: Consolidation as predictive forgetting">
+               For now, a single img (no class) displays in both themes. 
+              <img class="fig-light" src="fig1-light.svg" alt="Figure 1: Consolidation as predictive forgetting">
+              <img class="fig-dark" src="fig1-dark.svg" alt="Figure 1: Consolidation as predictive forgetting">
+               -->
+              <img class="fig-light" src="fig1-light.png" alt="Figure 1: Consolidation as predictive forgetting">
+              <img class="fig-dark" src="fig1-dark.png" alt="Figure 1: Consolidation as predictive forgetting">
         </div>
         <p class="fig-caption">Figure 1 — Consolidation progressively discards noise (green) while sharpening category-predictive features (red, blue).</p>
       </div>
