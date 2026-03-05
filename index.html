@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why the Brain Consolidates — Predictive Forgetting for Optimal Generalisation</title>
+<meta name="description" content="Consolidation implements predictive forgetting: the iterative elimination of information about sensory inputs that does not predict future outcomes, provably tightening generalisation bounds.">
+<meta property="og:title" content="Predictive Forgetting — Why the Brain Consolidates">
+<meta property="og:description" content="An information-theoretic framework showing that memory consolidation optimises generalisation through conditional information compression.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+<!-- KaTeX for proper math rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+
+<style>
+/* ===== RESET ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===== DESIGN TOKENS ===== */
+:root {
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-body: 'DM Sans', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --max-w: 1120px;
+  --section-gap: 7rem;
+  --radius: 10px;
+  --ease: .35s cubic-bezier(.4,0,.2,1);
+}
+
+/* ---------- LIGHT ---------- */
+[data-theme="light"] {
+  --bg-page: #faf9f7;
+  --bg-surface: #f0eeea;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f7f6f3;
+  --bg-nav: rgba(250,249,247,.88);
+  --border: #ddd8cf;
+  --border-subtle: #e8e4dd;
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #555;
+  --text-muted: #8a8a8a;
+
+  --accent: #6b4c9a;
+  --accent-dim: #8968b8;
+  --accent-glow: rgba(107,76,154,.07);
+  --accent-warm: #b5672e;
+  --accent-warm-glow: rgba(181,103,46,.06);
+  --accent-teal: #2a8f7d;
+  --accent-blue: #3a6faa;
+
+  --eq-bg: #f5f3ef;
+  --eq-border: #ddd8cf;
+  --eq-text: #4a3370;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 20px rgba(0,0,0,.06);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,.07);
+
+  --fig-bg: #fff;
+  --fig-border: #e4e0d8;
+}
+
+/* ---------- DARK ---------- */
+[data-theme="dark"] {
+  --bg-page: #0a0c10;
+  --bg-surface: #12151c;
+  --bg-card: #181c26;
+  --bg-card-hover: #1e2333;
+  --bg-nav: rgba(10,12,16,.82);
+  --border: #262d3d;
+  --border-subtle: #1e2333;
+
+  --text-primary: #e8eaf0;
+  --text-secondary: #9ba3b5;
+  --text-muted: #6b7385;
+
+  --accent: #b08de0;
+  --accent-dim: #8968b8;
+  --accent-glow: rgba(176,141,224,.1);
+  --accent-warm: #e8a44a;
+  --accent-warm-glow: rgba(232,164,74,.08);
+  --accent-teal: #5cc4b0;
+  --accent-blue: #5b9bd5;
+
+  --eq-bg: #181c26;
+  --eq-border: #262d3d;
+  --eq-text: #b08de0;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.2);
+  --shadow-md: 0 4px 20px rgba(0,0,0,.3);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.4);
+
+  --fig-bg: #fff;
+  --fig-border: #262d3d;
+}
+
+/* ===== BASE ===== */
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.72;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  transition: background var(--ease), color var(--ease);
+}
+img { max-width: 100%; height: auto; display: block; }
+.container { max-width: var(--max-w); margin: 0 auto; padding: 0 2rem; }
+
+/* Ambient background wash */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  transition: opacity var(--ease);
+}
+[data-theme="light"] body::before {
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 5%, rgba(107,76,154,.03) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 90%, rgba(181,103,46,.025) 0%, transparent 60%);
+}
+[data-theme="dark"] body::before {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(176,141,224,.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 80%, rgba(232,164,74,.03) 0%, transparent 60%);
+}
+
+/* ===== NAV ===== */
+.topnav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: var(--bg-nav);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--ease), border-color var(--ease), box-shadow .3s;
+}
+.topnav.scrolled { box-shadow: var(--shadow-sm); }
+.topnav-inner {
+  max-width: var(--max-w); margin: 0 auto; padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between; height: 54px;
+}
+.topnav-title {
+  font-family: var(--font-display);
+  font-size: .92rem; font-weight: 600;
+  color: var(--text-primary); letter-spacing: -0.01em;
+  transition: color var(--ease);
+}
+.topnav-title span { color: var(--accent); transition: color var(--ease); }
+.topnav-links { display: flex; gap: 1.4rem; align-items: center; }
+.topnav-links a {
+  font-size: .82rem; font-weight: 400;
+  color: var(--text-secondary); text-decoration: none; transition: color .2s;
+}
+.topnav-links a:hover { color: var(--text-primary); }
+.topnav-links .btn-sm {
+  background: var(--accent); color: #fff;
+  padding: .35rem .9rem; border-radius: 6px; font-weight: 500;
+  transition: background .2s, transform .15s;
+}
+.topnav-links .btn-sm:hover { opacity: .88; color: #fff; transform: translateY(-1px); }
+
+/* Theme toggle */
+.theme-toggle {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 8px; width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-muted);
+  transition: background var(--ease), border-color var(--ease), color .2s;
+}
+.theme-toggle:hover { color: var(--text-primary); border-color: var(--accent-dim); }
+.theme-toggle svg { width: 17px; height: 17px; transition: transform .35s; }
+.theme-toggle:active svg { transform: rotate(25deg); }
+.icon-sun, .icon-moon { display: none; }
+[data-theme="light"] .icon-moon { display: block; }
+[data-theme="dark"] .icon-sun { display: block; }
+
+/* ===== HERO ===== */
+.hero {
+  padding: 9.5rem 0 5rem; text-align: center;
+  position: relative; z-index: 1;
+}
+.hero-overline {
+  font-family: var(--font-mono);
+  font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 1.4rem;
+  opacity: 0; animation: fadeUp .8s .2s forwards;
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  font-weight: 700; line-height: 1.15; letter-spacing: -0.02em;
+  max-width: 780px; margin: 0 auto 1.2rem;
+  opacity: 0; animation: fadeUp .8s .35s forwards;
+}
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero-subtitle {
+  font-size: 1.1rem; color: var(--text-secondary);
+  max-width: 620px; margin: 0 auto 2rem; line-height: 1.75;
+  opacity: 0; animation: fadeUp .8s .5s forwards;
+}
+.hero-subtitle strong { color: var(--text-primary); }
+.hero-authors {
+  font-size: .86rem; color: var(--text-muted); margin-bottom: 2.4rem;
+  opacity: 0; animation: fadeUp .8s .65s forwards;
+}
+.hero-authors strong { color: var(--text-secondary); font-weight: 500; }
+.hero-badges {
+  display: flex; gap: .9rem; justify-content: center; flex-wrap: wrap;
+  opacity: 0; animation: fadeUp .8s .8s forwards;
+}
+.badge {
+  display: inline-flex; align-items: center; gap: .45rem;
+  padding: .5rem 1.1rem; border-radius: 8px;
+  font-size: .84rem; font-weight: 500; text-decoration: none;
+  border: 1px solid var(--border); color: var(--text-secondary);
+  background: var(--bg-card);
+  transition: all .25s;
+}
+.badge:hover {
+  border-color: var(--accent-dim); color: var(--text-primary);
+  background: var(--bg-card-hover);
+  transform: translateY(-1px); box-shadow: var(--shadow-sm);
+}
+.badge svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+/* ===== SECTIONS ===== */
+section { padding: var(--section-gap) 0; position: relative; z-index: 1; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: .68rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--accent-dim); margin-bottom: .75rem;
+  transition: color var(--ease);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 600; line-height: 1.25; letter-spacing: -0.01em;
+  margin-bottom: 1.1rem; transition: color var(--ease);
+}
+.section-desc {
+  font-size: 1.02rem; color: var(--text-secondary);
+  max-width: 660px; line-height: 1.75; transition: color var(--ease);
+}
+
+/* ===== KEY IDEA ===== */
+.key-idea {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--ease), border-color var(--ease);
+}
+.key-idea-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 3.5rem; align-items: center;
+}
+.equation-box {
+  background: var(--eq-bg); border: 1px solid var(--eq-border);
+  border-radius: var(--radius); padding: 1.4rem 1.6rem; margin-top: 1.8rem;
+  text-align: center;
+  transition: background var(--ease), border-color var(--ease);
+}
+.equation-box .eq-label {
+  font-family: var(--font-mono); font-size: .68rem;
+  color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: .12em; margin-bottom: .5rem;
+}
+.equation-box .katex { color: var(--eq-text); }
+.eq-note {
+  font-size: .82rem; color: var(--text-muted); margin-top: .8rem; line-height: 1.6;
+}
+.eq-note strong { color: var(--accent); font-weight: 500; }
+.fig-container {
+  border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--fig-border); background: var(--fig-bg);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--ease), box-shadow var(--ease);
+}
+.fig-caption {
+  font-size: .78rem; color: var(--text-muted);
+  margin-top: .55rem; font-style: italic;
+}
+
+/* ===== WAKE/SLEEP BOXES ===== */
+.phase-boxes { display: flex; gap: 1.4rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.phase-box {
+  flex: 1; min-width: 220px;
+  border-radius: var(--radius); padding: 1.2rem 1.4rem;
+  transition: background var(--ease), border-color var(--ease);
+}
+.phase-box.wake {
+  background: var(--accent-warm-glow);
+  border: 1px solid rgba(181,103,46,.15);
+}
+.phase-box.sleep {
+  background: var(--accent-glow);
+  border: 1px solid rgba(107,76,154,.15);
+}
+[data-theme="dark"] .phase-box.wake { border-color: rgba(232,164,74,.18); }
+[data-theme="dark"] .phase-box.sleep { border-color: rgba(176,141,224,.18); }
+.phase-label {
+  font-family: var(--font-mono);
+  font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .35rem;
+}
+.phase-box.wake .phase-label { color: var(--accent-warm); }
+.phase-box.sleep .phase-label { color: var(--accent); }
+.phase-box p { font-size: .88rem; color: var(--text-secondary); }
+
+/* ===== EXPERIMENT CARDS ===== */
+.experiments-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem; margin-top: 2.8rem;
+}
+.exp-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+  transition: all .3s;
+}
+.exp-card:hover {
+  border-color: var(--accent-dim); transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+.exp-card-img {
+  background: var(--fig-bg); padding: .4rem;
+  border-bottom: 1px solid var(--border);
+  transition: border-color var(--ease);
+}
+.exp-card-img img { width: 100%; border-radius: 6px; }
+.exp-card-body { padding: 1.4rem; }
+.exp-card-num {
+  font-family: var(--font-mono);
+  font-size: .62rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--accent-dim); margin-bottom: .4rem;
+}
+.exp-card-body h3 {
+  font-family: var(--font-display);
+  font-size: 1.05rem; font-weight: 600; margin-bottom: .65rem;
+  line-height: 1.35; transition: color var(--ease);
+}
+.exp-card-body p {
+  font-size: .86rem; color: var(--text-secondary);
+  line-height: 1.65; transition: color var(--ease);
+}
+.exp-tag {
+  display: inline-block; margin-top: .9rem;
+  padding: .22rem .65rem; border-radius: 4px;
+  font-size: .7rem; font-weight: 500; letter-spacing: .03em;
+}
+.tag-purple { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(107,76,154,.15); }
+.tag-orange { background: var(--accent-warm-glow); color: var(--accent-warm); border: 1px solid rgba(181,103,46,.15); }
+.tag-teal { background: rgba(42,143,125,.06); color: var(--accent-teal); border: 1px solid rgba(42,143,125,.15); }
+[data-theme="dark"] .tag-purple { border-color: rgba(176,141,224,.2); }
+[data-theme="dark"] .tag-orange { border-color: rgba(232,164,74,.2); }
+[data-theme="dark"] .tag-teal { border-color: rgba(92,196,176,.2); }
+
+/* ===== CAPACITY RESULT ===== */
+.result-highlight {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--ease), border-color var(--ease);
+}
+.result-grid {
+  display: grid; grid-template-columns: 1.1fr 1fr;
+  gap: 3.5rem; align-items: center;
+}
+.result-grid .fig-container { max-width: 530px; }
+.result-callout {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1.2rem 1.4rem; margin-top: 1.4rem;
+  font-size: .9rem; color: var(--text-secondary); line-height: 1.7;
+  transition: background var(--ease), border-color var(--ease), color var(--ease);
+}
+.result-callout strong { color: var(--accent); font-weight: 500; }
+
+/* ===== PREDICTIONS TABLE ===== */
+.predictions-section { padding-bottom: 5rem; }
+.predictions-table {
+  width: 100%; margin-top: 2.4rem;
+  border-collapse: separate; border-spacing: 0;
+  border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  transition: border-color var(--ease);
+}
+.predictions-table thead th {
+  background: var(--bg-surface);
+  font-family: var(--font-mono);
+  font-size: .68rem; letter-spacing: .11em; text-transform: uppercase;
+  color: var(--text-muted); padding: .9rem 1.1rem;
+  text-align: left; font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--ease), border-color var(--ease), color var(--ease);
+}
+.predictions-table tbody td {
+  padding: .85rem 1.1rem;
+  font-size: .86rem; color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: top;
+  transition: color var(--ease), border-color var(--ease);
+}
+.predictions-table tbody tr:last-child td { border-bottom: none; }
+.predictions-table tbody tr:hover { background: var(--bg-card); }
+.predictions-table tbody td:first-child {
+  font-weight: 500; color: var(--text-primary); white-space: nowrap;
+}
+.status-badge {
+  display: inline-block; padding: .15rem .55rem;
+  border-radius: 4px; font-size: .7rem; font-weight: 500;
+}
+.status-grounding { background: rgba(42,143,125,.08); color: var(--accent-teal); }
+.status-unification { background: rgba(58,111,170,.08); color: var(--accent-blue); }
+.status-prediction { background: var(--accent-glow); color: var(--accent); }
+
+/* ===== CITATION ===== */
+.citation-section { padding: 4rem 0 6rem; }
+.cite-box {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.7rem 1.8rem; position: relative;
+  transition: background var(--ease), border-color var(--ease);
+}
+.cite-box pre {
+  font-family: var(--font-mono);
+  font-size: .76rem; line-height: 1.7; color: var(--text-secondary);
+  white-space: pre-wrap; word-break: break-word;
+  transition: color var(--ease);
+}
+.cite-copy {
+  position: absolute; top: 1rem; right: 1rem;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: .38rem .8rem; border-radius: 6px;
+  font-size: .73rem; font-family: var(--font-body);
+  cursor: pointer; transition: all .2s;
+}
+.cite-copy:hover { color: var(--text-primary); border-color: var(--accent-dim); }
+
+/* ===== FOOTER ===== */
+footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: 2.5rem 0; text-align: center;
+  font-size: .8rem; color: var(--text-muted);
+  transition: border-color var(--ease), color var(--ease);
+}
+footer a { color: var(--text-secondary); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.reveal {
+  opacity: 0; transform: translateY(22px);
+  transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .key-idea-grid, .result-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .experiments-grid { grid-template-columns: 1fr; }
+  .topnav-title { display: none; }
+  :root { --section-gap: 4.5rem; }
+}
+@media (max-width: 600px) {
+  .hero { padding: 7rem 0 3rem; }
+  .hero h1 { font-size: 1.7rem; }
+  .topnav-links { gap: .6rem; }
+  .topnav-links a:not(.btn-sm):not(.theme-toggle) { display: none; }
+  .predictions-table { font-size: .78rem; }
+  .predictions-table tbody td:first-child { white-space: normal; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav" id="topnav">
+  <div class="topnav-inner">
+    <div class="topnav-title">Predictive <span>Forgetting</span></div>
+    <div class="topnav-links">
+      <a href="#idea">Key Idea</a>
+      <a href="#experiments">Experiments</a>
+      <a href="#predictions">Predictions</a>
+      <a href="#cite">Cite</a>
+      <a href="https://arxiv.org/abs/XXXX.XXXXX" class="btn-sm" target="_blank">arXiv Paper</a>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark/light theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero container">
+  <div class="hero-overline">Fountas et al. · 2025</div>
+  <h1>Why the Brain Consolidates: <em>Predictive Forgetting</em> for Optimal Generalisation</h1>
+  <p class="hero-subtitle">
+    We show that memory consolidation implements <strong>conditional information compression</strong> — the iterative elimination of sensory information that does not predict future outcomes — provably tightening generalisation bounds.
+  </p>
+  <p class="hero-authors">
+    <strong>Zafeirios Fountas</strong><sup>1*</sup>,
+    Adnan Oomerjee<sup>1,2</sup>,
+    Haitham Bou-Ammar<sup>1,2</sup>,
+    Jun Wang<sup>2</sup>,
+    <strong>Neil Burgess</strong><sup>3,4</sup><br>
+    <span style="font-size:.78rem">
+      <sup>1</sup>Huawei Noah's Ark Lab &nbsp;
+      <sup>2</sup>UCL Computer Science &nbsp;
+      <sup>3</sup>UCL Institute of Cognitive Neuroscience &nbsp;
+      <sup>4</sup>UCL Queen Square Institute of Neurology
+    </span>
+  </p>
+  <div class="hero-badges">
+    <a href="https://arxiv.org/abs/XXXX.XXXXX" class="badge" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      arXiv Preprint
+    </a>
+    <a href="https://github.com/zfountas/predictive-forgetting" class="badge" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      Code
+    </a>
+    <a href="#cite" class="badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9h6V5l7 7-7 7v-4H6V9z"/></svg>
+      Cite this work
+    </a>
+  </div>
+</header>
+
+<!-- KEY IDEA -->
+<section class="key-idea" id="idea">
+  <div class="container">
+    <div class="key-idea-grid reveal">
+      <div class="key-idea-text">
+        <div class="section-label">Core Principle</div>
+        <h2 class="section-title">Forgetting is not failure — it is the mechanism of generalisation</h2>
+        <p class="section-desc">
+          During encoding, the brain captures every detail: lighting, texture, background. But most of this information is <em>noise</em> for future decisions. We show that consolidation progressively strips away sensory details that do not predict outcomes, leaving behind the semantic core that transfers to novel situations. This is <strong>predictive forgetting</strong>.
+        </p>
+        <div class="equation-box">
+          <div class="eq-label">Generalisation Bound</div>
+          <div class="math-display">$$\Delta \;\leq\; \tilde{\mathcal{O}}\!\left(\sqrt{\frac{I(X;\,Z \mid Y)\;+\;C}{n}}\right)$$</div>
+        </div>
+        <p class="eq-note">
+          The generalisation gap is bounded by <strong>$I(X; Z \mid Y)$</strong> — the information your memory retains about the input <em>that doesn't predict the outcome</em>. Consolidation minimises this term.
+        </p>
+      </div>
+      <div>
+        <div class="fig-container">
+          <img src="fig1.png" alt="Figure 1: Consolidation as predictive forgetting">
+        </div>
+        <p class="fig-caption">Figure 1 — Consolidation progressively discards noise (green) while sharpening category-predictive features (red, blue).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY OFFLINE -->
+<section id="why-offline">
+  <div class="container reveal">
+    <div class="section-label">The Fidelity–Generalisation Conflict</div>
+    <h2 class="section-title" style="max-width:700px;">Why can't the brain just learn compressed representations in a single pass?</h2>
+    <p class="section-desc" style="margin-bottom:1.5rem;">
+      Rapid perception demands high fidelity — you must capture every detail of a novel scene for immediate survival. But optimal generalisation demands compression. These objectives are <strong style="color:var(--text-primary)">mathematically incompatible</strong> in a single encoding step. Temporal separation resolves this: <span style="color:var(--accent-warm)">encode richly during wake</span>, then <span style="color:var(--accent)">compress iteratively during sleep</span>.
+    </p>
+    <div class="phase-boxes">
+      <div class="phase-box wake">
+        <div class="phase-label">Wake · Online</div>
+        <p>Maximise $I(X; Z)$ — capture everything for immediate inference and one-shot learning.</p>
+      </div>
+      <div class="phase-box sleep">
+        <div class="phase-label">Sleep · Offline</div>
+        <p>Minimise $I(X; Z \mid Y)$ — discard sensory noise, retain only what predicts outcomes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIMENTS -->
+<section id="experiments">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Three Implementations</div>
+      <h2 class="section-title">Validated across diverse substrates</h2>
+      <p class="section-desc">The same principle — reduce $I(X; Z \mid Y)$, preserve $I(Y; Z)$ — operates in cortical circuits, predictive coding networks, and large language models.</p>
+    </div>
+
+    <div class="experiments-grid">
+      <div class="exp-card reveal">
+        <div class="exp-card-img">
+          <img src="fig2.png" alt="Figure 2: Iterative refinement tightens generalisation bounds">
+        </div>
+        <div class="exp-card-body">
+          <div class="exp-card-num">Experiment I</div>
+          <h3>Cortical Latent Code Refinement</h3>
+          <p>A frozen encoder captures high-fidelity codes. A lightweight refiner iteratively compresses them offline — without re-accessing sensory input. Across five benchmarks, this shrinks the generalisation gap while <em>increasing</em> accuracy.</p>
+          <span class="exp-tag tag-purple">Autoencoder · 5 datasets</span>
+        </div>
+      </div>
+
+      <div class="exp-card reveal">
+        <div class="exp-card-img">
+          <img src="fig3.png" alt="Figure 3: Bidirectional predictive coding wake-sleep consolidation">
+        </div>
+        <div class="exp-card-body">
+          <div class="exp-card-num">Experiment II</div>
+          <h3>Bidirectional Predictive Coding</h3>
+          <p>A biologically plausible circuit exploits its generative model to "dream" denoised versions of stored memories. Stronger homeostatic priors during sleep compress representations — and the benefit scales with network capacity.</p>
+          <span class="exp-tag tag-orange">Predictive Coding · Wake-Sleep</span>
+        </div>
+      </div>
+
+      <div class="exp-card reveal">
+        <div class="exp-card-img">
+          <img src="fig5.png" alt="Figure 5: Hierarchical cache refinement in LLMs">
+        </div>
+        <div class="exp-card-body">
+          <div class="exp-card-num">Experiment III</div>
+          <h3>LLM Cache Consolidation</h3>
+          <p>A Cache Refiner iteratively rewrites the Key-Value store of a frozen Llama-3-8B. This closes the generalisation gap on reasoning tasks and reveals coarse-to-fine hierarchy: global renormalisation in early layers, selective editing in deep layers.</p>
+          <span class="exp-tag tag-teal">Transformer · Llama-3-8B</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CAPACITY RESULT -->
+<section class="result-highlight" id="capacity">
+  <div class="container">
+    <div class="result-grid reveal">
+      <div>
+        <div class="section-label">Key Result</div>
+        <h2 class="section-title">High-capacity systems <em>need</em> consolidation</h2>
+        <p class="section-desc">
+          In low-capacity networks, architectural bottlenecks naturally enforce compression — replay is redundant. But in high-capacity regimes characteristic of mammalian neocortex, the system memorises sensory noise, causing catastrophic overfitting. Offline consolidation resolves this, allowing the system to scale capacity without sacrificing generalisation.
+        </p>
+        <div class="result-callout">
+          <strong>Normative explanation:</strong> The mammalian neocortex, which possesses immense capacity, requires prolonged offline consolidation to generalise well — because single-pass encoding retains outcome-irrelevant detail.
+        </div>
+      </div>
+      <div class="fig-container">
+        <img src="fig4.png" alt="Figure 4: Consolidation resolves the capacity-generalisation trade-off">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREDICTIONS -->
+<section class="predictions-section" id="predictions">
+  <div class="container reveal">
+    <div class="section-label">Testable Predictions</div>
+    <h2 class="section-title">Empirical signatures of predictive forgetting</h2>
+    <p class="section-desc" style="margin-bottom:0;">The framework generates quantitative predictions testable with current neuroimaging methods.</p>
+
+    <table class="predictions-table">
+      <thead>
+        <tr><th>Mechanism</th><th>Neural Signature</th><th>Methods</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Temporal Compression</td>
+          <td>Manifold radius/dimension reduction; increased within-category similarity</td>
+          <td>fMRI RSA, Manifold Capacity Analysis</td>
+          <td><span class="status-badge status-grounding">Grounding</span></td>
+        </tr>
+        <tr>
+          <td>Sleep Acceleration</td>
+          <td>$I(X; Z)$ compression accelerates during sleep vs. wake</td>
+          <td>Sleep manipulation, fMRI reactivation</td>
+          <td><span class="status-badge status-grounding">Grounding</span></td>
+        </tr>
+        <tr>
+          <td>Generalisation Link</td>
+          <td>Neural compression predicts out-of-distribution performance</td>
+          <td>Behavioural transfer tests</td>
+          <td><span class="status-badge status-grounding">Grounding</span></td>
+        </tr>
+        <tr>
+          <td>Readout Sharpening</td>
+          <td>Increased SNR in memory traces; synaptic down-selection</td>
+          <td>Longitudinal 7T fMRI, electrophysiology</td>
+          <td><span class="status-badge status-grounding">Grounding</span></td>
+        </tr>
+        <tr>
+          <td>Predictive Codes</td>
+          <td>Shift from retrospective to prospective successor representations</td>
+          <td>Sequential learning tasks</td>
+          <td><span class="status-badge status-unification">Unification</span></td>
+        </tr>
+        <tr>
+          <td>Hierarchical Gradients</td>
+          <td>Compression magnitude scales with cortical hierarchy</td>
+          <td>Multi-region fMRI</td>
+          <td><span class="status-badge status-prediction">Prediction</span></td>
+        </tr>
+        <tr>
+          <td>Reconsolidation</td>
+          <td>Retrieval induces further compression of the trace</td>
+          <td>Retrieval-practice paradigms</td>
+          <td><span class="status-badge status-prediction">Prediction</span></td>
+        </tr>
+        <tr>
+          <td>Structure / Content Split</td>
+          <td>Temporal keys stable, sensory values compressed</td>
+          <td>LLM analysis, HC subfield recording</td>
+          <td><span class="status-badge status-prediction">Prediction</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CITATION -->
+<section class="citation-section" id="cite">
+  <div class="container reveal">
+    <div class="section-label">Citation</div>
+    <h2 class="section-title">Cite this work</h2>
+    <div class="cite-box">
+      <button class="cite-copy" onclick="copyBib()">Copy BibTeX</button>
+      <pre id="bibtex">@article{fountas2025predictiveforgetting,
+  title   = {Why the Brain Consolidates: Predictive Forgetting
+             for Optimal Generalisation},
+  author  = {Fountas, Zafeirios and Oomerjee, Adnan and
+             Bou-Ammar, Haitham and Wang, Jun and Burgess, Neil},
+  journal = {arXiv preprint arXiv:XXXX.XXXXX},
+  year    = {2025}
+}</pre>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>
+      Predictive Forgetting ·
+      <a href="https://arxiv.org/abs/XXXX.XXXXX" target="_blank">arXiv</a> ·
+      <a href="https://github.com/zfountas/predictive-forgetting" target="_blank">GitHub</a> ·
+      <a href="https://zfrn.org" target="_blank">Zafeirios Fountas</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+// Theme toggle with localStorage
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  try { localStorage.setItem('pf-theme', next); } catch(e) {}
+}
+// Restore preference (fallback to light)
+try {
+  const saved = localStorage.getItem('pf-theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+} catch(e) {}
+
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
+}, { threshold: 0.1 });
+reveals.forEach(el => io.observe(el));
+
+// Nav shadow
+window.addEventListener('scroll', () => {
+  document.getElementById('topnav').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// Copy BibTeX
+function copyBib() {
+  const bib = document.getElementById('bibtex').textContent;
+  navigator.clipboard.writeText(bib).then(() => {
+    const btn = document.querySelector('.cite-copy');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy BibTeX', 2000);
+  });
+}
+</script>
+
+</body>
+</html>
