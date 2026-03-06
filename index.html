@@ -476,10 +476,10 @@ tr.pred-detail.open .pred-detail-inner {
 /* ===== THEME-AWARE FIGURES ===== */
 /* Use class fig-light / fig-dark on <img> elements for theme-switched figures.
    If only one img is present (no class), it displays in both themes. */
-.fig-container img.fig-light { display: block; }
-.fig-container img.fig-dark { display: none; }
-[data-theme="dark"] .fig-container img.fig-light { display: none; }
-[data-theme="dark"] .fig-container img.fig-dark { display: block; }
+.fig-container img.fig-light, .exp-card-img img.fig-light { display: block; }
+.fig-container img.fig-dark, .exp-card-img img.fig-dark { display: none; }
+[data-theme="dark"] .fig-container img.fig-light, [data-theme="dark"] .exp-card-img img.fig-light { display: none; }
+[data-theme="dark"] .fig-container img.fig-dark, [data-theme="dark"] .exp-card-img img.fig-dark { display: block; }
 
 /* ===== CITATION ===== */
 .citation-section { padding: 4rem 0 6rem; }
@@ -552,7 +552,7 @@ footer a:hover { color: var(--accent); }
       <a href="#experiments">Experiments</a>
       <a href="#predictions">Predictions</a>
       <a href="#cite">Cite</a>
-      <a href="https://arxiv.org/abs/XXXX.XXXXX" class="btn-sm" target="_blank">arXiv Paper</a>
+      <a href="https://arxiv.org/abs/2603.04688" class="btn-sm" target="_blank">arXiv Paper</a>
       <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark/light theme">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -582,7 +582,7 @@ footer a:hover { color: var(--accent); }
     </span>
   </p>
   <div class="hero-badges">
-    <a href="https://arxiv.org/abs/XXXX.XXXXX" class="badge" target="_blank">
+    <a href="https://arxiv.org/abs/2603.04688" class="badge" target="_blank">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       arXiv Preprint
     </a>
@@ -617,19 +617,8 @@ footer a:hover { color: var(--accent); }
       </div>
       <div>
         <div class="fig-container" style="border:none; box-shadow:none">
-          <!-- FIGURE OPTIONS:
-               Background: default is transparent. Add class "fig-padded" for white inset.
-               Size: add class "fig-sm" (360px), "fig-md" (500px), "fig-lg" (700px),
-                     or use inline style: style="max-width: 450px"
-               Border: remove border with style="border:none; box-shadow:none"
-               Theme variants: use <img class="fig-light"> and <img class="fig-dark">
-          -->
-          <!-- THEME-AWARE FIGURES: When you have light/dark variants, use:
-               CSS automatically shows the correct one per theme.
-               For now, a single img (no class) displays in both themes. 
-               -->
-              <img class="fig-light" src="fig1-light.svg" alt="Figure 1: Consolidation as predictive forgetting">
-              <img class="fig-dark" src="fig1-dark.svg" alt="Figure 1: Consolidation as predictive forgetting">
+          <img class="fig-light" src="fig1-light.png" alt="Figure 1: Consolidation as predictive forgetting">
+          <img class="fig-dark" src="fig1-dark.png" alt="Figure 1: Consolidation as predictive forgetting">
         </div>
         <p class="fig-caption">Figure 1 — Consolidation progressively discards noise (green) while sharpening category-predictive features (red, blue).</p>
       </div>
@@ -669,8 +658,9 @@ footer a:hover { color: var(--accent); }
 
     <div class="experiments-grid">
       <div class="exp-card reveal">
-        <div class="exp-card-img">
-          <img src="fig2.png" alt="Figure 2: Iterative refinement tightens generalisation bounds">
+        <div class="exp-card-img" style="border:none; box-shadow:none">
+          <img class="fig-light" src="fig2-light.png" alt="Figure 2: Iterative refinement tightens generalisation bounds">
+          <img class="fig-dark" src="fig2-dark.png" alt="Figure 2: Iterative refinement tightens generalisation bounds">
         </div>
         <div class="exp-card-body">
           <div class="exp-card-num">Experiment I</div>
@@ -681,8 +671,9 @@ footer a:hover { color: var(--accent); }
       </div>
 
       <div class="exp-card reveal">
-        <div class="exp-card-img">
-          <img src="fig3.png" alt="Figure 3: Bidirectional predictive coding wake-sleep consolidation">
+        <div class="exp-card-img" style="border:none; box-shadow:none">
+          <img class="fig-light" src="fig3-light.png" alt="Figure 3: Bidirectional predictive coding wake-sleep consolidation">
+          <img class="fig-dark" src="fig3-dark.png" alt="Figure 3: Bidirectional predictive coding wake-sleep consolidation">
         </div>
         <div class="exp-card-body">
           <div class="exp-card-num">Experiment II</div>
@@ -693,8 +684,9 @@ footer a:hover { color: var(--accent); }
       </div>
 
       <div class="exp-card reveal">
-        <div class="exp-card-img">
-          <img src="fig5.png" alt="Figure 5: Hierarchical cache refinement in LLMs">
+        <div class="exp-card-img" style="border:none; box-shadow:none">
+          <img class="fig-light" src="fig5-light.png" alt="Figure 5: Hierarchical cache refinement in LLMs">
+          <img class="fig-dark" src="fig5-dark.png" alt="Figure 5: Hierarchical cache refinement in LLMs">
         </div>
         <div class="exp-card-body">
           <div class="exp-card-num">Experiment III</div>
@@ -721,8 +713,9 @@ footer a:hover { color: var(--accent); }
           <strong>Normative explanation:</strong> The mammalian neocortex, which possesses immense capacity, requires prolonged offline consolidation to generalise well — because single-pass encoding retains outcome-irrelevant detail.
         </div>
       </div>
-      <div class="fig-container">
-        <img src="fig4.png" alt="Figure 4: Consolidation resolves the capacity-generalisation trade-off">
+      <div class="fig-container" style="border:none; box-shadow:none">
+        <img class="fig-light" src="fig4-light.png" alt="Figure 4: Consolidation resolves the capacity-generalisation trade-off">
+        <img class="fig-dark" src="fig4-dark.png" alt="Figure 4: Consolidation resolves the capacity-generalisation trade-off">
       </div>
     </div>
   </div>
@@ -849,13 +842,15 @@ footer a:hover { color: var(--accent); }
     <h2 class="section-title">Cite this work</h2>
     <div class="cite-box">
       <button class="cite-copy" onclick="copyBib()">Copy BibTeX</button>
-      <pre id="bibtex">@article{fountas2026predictiveforgetting,
-  title   = {Why the Brain Consolidates: Predictive Forgetting
-             for Optimal Generalisation},
-  author  = {Fountas, Zafeirios and Oomerjee, Adnan and
-             Bou-Ammar, Haitham and Wang, Jun and Burgess, Neil},
-  journal = {arXiv preprint arXiv:XXXX.XXXXX},
-  year    = {2026}
+      <pre id="bibtex">@misc{fountas2026predictiveforgetting,
+  title         = {Why the Brain Consolidates: Predictive Forgetting
+                   for Optimal Generalisation},
+  author        = {Zafeirios Fountas and Adnan Oomerjee and
+                   Haitham Bou-Ammar and Jun Wang and Neil Burgess},
+  year          = {2026},
+  eprint        = {2603.04688},
+  archivePrefix = {arXiv},
+  url           = {https://arxiv.org/abs/2603.04688}
 }</pre>
     </div>
   </div>
@@ -865,7 +860,7 @@ footer a:hover { color: var(--accent); }
   <div class="container">
     <p>
       Predictive Forgetting ·
-      <a href="https://arxiv.org/abs/XXXX.XXXXX" target="_blank">arXiv</a> ·
+      <a href="https://arxiv.org/abs/2603.04688" target="_blank">arXiv</a> ·
       <a href="https://github.com/zfountas/predictive-forgetting" target="_blank">GitHub</a> ·
       <a href="https://zfountas.com/" target="_blank">Zafeirios Fountas</a>
     </p>
