@@ -349,6 +349,16 @@ section { padding: var(--section-gap) 0; position: relative; z-index: 1; }
   transition: border-color var(--ease);
 }
 .exp-card-img img { width: 100%; border-radius: 6px; }
+.exp-card-img-link {
+  display: block; text-decoration: none; position: relative; cursor: pointer;
+}
+.exp-card-img-link:hover .exp-card-img { opacity: 0.85; }
+.fig-link-hint {
+  display: block; text-align: center; padding: .35rem 0 .1rem;
+  font-size: .78rem; color: var(--muted); opacity: 0;
+  transition: opacity var(--ease);
+}
+.exp-card-img-link:hover .fig-link-hint { opacity: 1; }
 .exp-card-body { padding: 1.4rem; }
 .exp-card-num {
   font-family: var(--font-mono);
@@ -617,8 +627,8 @@ footer a:hover { color: var(--accent); }
       </div>
       <div>
         <div class="fig-container" style="border:none; box-shadow:none">
-          <img class="fig-light" src="fig1-light.png" alt="Figure 1: Consolidation as predictive forgetting">
-          <img class="fig-dark" src="fig1-dark.png" alt="Figure 1: Consolidation as predictive forgetting">
+          <img class="fig-light" src="fig1-light.svg" alt="Figure 1: Consolidation as predictive forgetting">
+          <img class="fig-dark" src="fig1-dark.svg" alt="Figure 1: Consolidation as predictive forgetting">
         </div>
         <p class="fig-caption">Figure 1 — Consolidation progressively discards noise (green) while sharpening category-predictive features (red, blue).</p>
       </div>
@@ -658,10 +668,13 @@ footer a:hover { color: var(--accent); }
 
     <div class="experiments-grid">
       <div class="exp-card reveal">
-        <div class="exp-card-img" style="border:none; box-shadow:none">
-          <img class="fig-light" src="fig2-light.png" alt="Figure 2: Iterative refinement tightens generalisation bounds">
-          <img class="fig-dark" src="fig2-dark.png" alt="Figure 2: Iterative refinement tightens generalisation bounds">
-        </div>
+        <a href="https://arxiv.org/html/2603.04688v1#S3" target="_blank" class="exp-card-img-link">
+          <div class="exp-card-img" style="border:none; box-shadow:none">
+            <img class="fig-light" src="fig2-light.svg" alt="Figure 2: Iterative refinement tightens generalisation bounds">
+            <img class="fig-dark" src="fig2-dark.svg" alt="Figure 2: Iterative refinement tightens generalisation bounds">
+          </div>
+          <span class="fig-link-hint">View in paper →</span>
+        </a>
         <div class="exp-card-body">
           <div class="exp-card-num">Experiment I</div>
           <h3>Cortical Latent Code Refinement</h3>
@@ -671,10 +684,13 @@ footer a:hover { color: var(--accent); }
       </div>
 
       <div class="exp-card reveal">
-        <div class="exp-card-img" style="border:none; box-shadow:none">
-          <img class="fig-light" src="fig3-light.png" alt="Figure 3: Bidirectional predictive coding wake-sleep consolidation">
-          <img class="fig-dark" src="fig3-dark.png" alt="Figure 3: Bidirectional predictive coding wake-sleep consolidation">
-        </div>
+        <a href="https://arxiv.org/html/2603.04688v1#S3" target="_blank" class="exp-card-img-link">
+          <div class="exp-card-img" style="border:none; box-shadow:none">
+            <img class="fig-light" src="fig3-light.svg" alt="Figure 3: Bidirectional predictive coding wake-sleep consolidation">
+            <img class="fig-dark" src="fig3-dark.svg" alt="Figure 3: Bidirectional predictive coding wake-sleep consolidation">
+          </div>
+          <span class="fig-link-hint">View in paper →</span>
+        </a>
         <div class="exp-card-body">
           <div class="exp-card-num">Experiment II</div>
           <h3>Bidirectional Predictive Coding</h3>
@@ -684,10 +700,13 @@ footer a:hover { color: var(--accent); }
       </div>
 
       <div class="exp-card reveal">
-        <div class="exp-card-img" style="border:none; box-shadow:none">
-          <img class="fig-light" src="fig5-light.png" alt="Figure 5: Hierarchical cache refinement in LLMs">
-          <img class="fig-dark" src="fig5-dark.png" alt="Figure 5: Hierarchical cache refinement in LLMs">
-        </div>
+        <a href="https://arxiv.org/html/2603.04688v1#S3" target="_blank" class="exp-card-img-link">
+          <div class="exp-card-img" style="border:none; box-shadow:none">
+            <img class="fig-light" src="fig5-light.svg" alt="Figure 5: Hierarchical cache refinement in LLMs">
+            <img class="fig-dark" src="fig5-dark.svg" alt="Figure 5: Hierarchical cache refinement in LLMs">
+          </div>
+          <span class="fig-link-hint">View in paper →</span>
+        </a>
         <div class="exp-card-body">
           <div class="exp-card-num">Experiment III</div>
           <h3>LLM Cache Consolidation</h3>
@@ -714,8 +733,8 @@ footer a:hover { color: var(--accent); }
         </div>
       </div>
       <div class="fig-container" style="border:none; box-shadow:none">
-        <img class="fig-light" src="fig4-light.png" alt="Figure 4: Consolidation resolves the capacity-generalisation trade-off">
-        <img class="fig-dark" src="fig4-dark.png" alt="Figure 4: Consolidation resolves the capacity-generalisation trade-off">
+        <img class="fig-light" src="fig4-light.svg" alt="Figure 4: Consolidation resolves the capacity-generalisation trade-off">
+        <img class="fig-dark" src="fig4-dark.svg" alt="Figure 4: Consolidation resolves the capacity-generalisation trade-off">
       </div>
     </div>
   </div>
