@@ -304,13 +304,46 @@ section { padding: var(--section-gap) 0; position: relative; z-index: 1; }
   margin-top: .55rem; font-style: italic;
 }
 
+/* ===== CONFLICT LAYOUT ===== */
+.conflict-layout {
+  display: flex; align-items: flex-start; gap: 2.5rem;
+}
+.conflict-text { flex: 3; min-width: 0; }
+.conflict-figure {
+  flex: 1; min-width: 180px; max-width: 260px;
+  position: relative; align-self: center;
+}
+.conflict-img {
+  width: 100%;
+  position: absolute; top: 0; left: 0;
+  opacity: 0; transition: opacity 0.4s ease;
+  /* Hidden by default; theme CSS controls display, active controls opacity */
+}
+.conflict-img.active {
+  position: relative; opacity: 1;
+}
+/* Inactive conflict images stay hidden even if theme says display:block */
+.conflict-figure img.conflict-img:not(.active) { opacity: 0; position: absolute; }
+.conflict-figure img.conflict-img.active { opacity: 1; position: relative; }
+.conflict-fig-label {
+  text-align: center; font-size: .75rem; color: var(--muted);
+  margin-top: .5rem; opacity: .7;
+  transition: opacity var(--ease);
+}
+@media (max-width: 720px) {
+  .conflict-layout { flex-direction: column; }
+  .conflict-figure { max-width: 200px; align-self: center; }
+}
+
 /* ===== WAKE/SLEEP BOXES ===== */
 .phase-boxes { display: flex; gap: 1.4rem; flex-wrap: wrap; margin-top: 1.5rem; }
 .phase-box {
   flex: 1; min-width: 220px;
   border-radius: var(--radius); padding: 1.2rem 1.4rem;
-  transition: background var(--ease), border-color var(--ease);
+  cursor: pointer;
+  transition: background var(--ease), border-color var(--ease), transform 0.2s ease;
 }
+.phase-box:hover { transform: translateY(-1px); }
 .phase-box.wake {
   background: var(--accent-warm-glow);
   border: 1px solid rgba(181,103,46,.15);
@@ -486,10 +519,10 @@ tr.pred-detail.open .pred-detail-inner {
 /* ===== THEME-AWARE FIGURES ===== */
 /* Use class fig-light / fig-dark on <img> elements for theme-switched figures.
    If only one img is present (no class), it displays in both themes. */
-.fig-container img.fig-light, .exp-card-img img.fig-light { display: block; }
-.fig-container img.fig-dark, .exp-card-img img.fig-dark { display: none; }
-[data-theme="dark"] .fig-container img.fig-light, [data-theme="dark"] .exp-card-img img.fig-light { display: none; }
-[data-theme="dark"] .fig-container img.fig-dark, [data-theme="dark"] .exp-card-img img.fig-dark { display: block; }
+.fig-container img.fig-light, .exp-card-img img.fig-light, .conflict-figure img.fig-light { display: block; }
+.fig-container img.fig-dark, .exp-card-img img.fig-dark, .conflict-figure img.fig-dark { display: none; }
+[data-theme="dark"] .fig-container img.fig-light, [data-theme="dark"] .exp-card-img img.fig-light, [data-theme="dark"] .conflict-figure img.fig-light { display: none; }
+[data-theme="dark"] .fig-container img.fig-dark, [data-theme="dark"] .exp-card-img img.fig-dark, [data-theme="dark"] .conflict-figure img.fig-dark { display: block; }
 
 /* ===== CITATION ===== */
 .citation-section { padding: 4rem 0 6rem; }
@@ -639,17 +672,28 @@ footer a:hover { color: var(--accent); }
 <!-- WHY OFFLINE -->
 <section id="why-offline">
   <div class="container reveal">
-    <div class="section-label">The Fidelity–Generalisation Conflict</div>
-    <h2 class="section-title" style="max-width:700px;">Why can't the brain just learn compressed representations in a single pass?</h2>
-    <p class="section-desc" style="margin-bottom:1.5rem;">
-      Rapid perception demands high fidelity — you must capture every detail of a novel scene for immediate survival. But optimal generalisation demands compression. These objectives are <strong style="color:var(--text-primary)">mathematically incompatible</strong> in a single encoding step. Temporal separation resolves this: <span style="color:var(--accent-warm)">encode richly during wake</span>, then <span style="color:var(--accent)">compress iteratively during sleep</span>.
-    </p>
+    <div class="conflict-layout">
+      <div class="conflict-text">
+        <div class="section-label">The Fidelity–Generalisation Conflict</div>
+        <h2 class="section-title" style="max-width:700px;">Why can't the brain just learn compressed representations in a single pass?</h2>
+        <p class="section-desc" style="margin-bottom:1.5rem;">
+          Rapid perception demands high fidelity — you must capture every detail of a novel scene for immediate survival. But optimal generalisation demands compression. These objectives are <strong style="color:var(--text-primary)">mathematically incompatible</strong> in a single encoding step. Temporal separation resolves this: <span style="color:var(--accent-warm)">encode richly during wake</span>, then <span style="color:var(--accent)">compress iteratively during sleep</span>.
+        </p>
+      </div>
+      <div class="conflict-figure">
+        <img src="online-light.svg" alt="Wake: online encoding" class="conflict-img conflict-img-wake fig-light active">
+        <img src="online-dark.svg" alt="Wake: online encoding" class="conflict-img conflict-img-wake fig-dark active">
+        <img src="offline-light.svg" alt="Sleep: offline consolidation" class="conflict-img conflict-img-sleep fig-light">
+        <img src="offline-dark.svg" alt="Sleep: offline consolidation" class="conflict-img conflict-img-sleep fig-dark">
+        <div class="conflict-fig-label">Hover the boxes below</div>
+      </div>
+    </div>
     <div class="phase-boxes">
-      <div class="phase-box wake">
+      <div class="phase-box wake" onmouseenter="showConflictFig('wake')" onmouseleave="showConflictFig('wake')">
         <div class="phase-label">Wake · Online</div>
         <p>Maximise $I(X; Z)$ — capture everything for immediate inference and one-shot learning.</p>
       </div>
-      <div class="phase-box sleep">
+      <div class="phase-box sleep" onmouseenter="showConflictFig('sleep')" onmouseleave="showConflictFig('wake')">
         <div class="phase-label">Sleep · Offline</div>
         <p>Minimise $I(X; Z \mid Y)$ — discard sensory noise, retain only what predicts outcomes.</p>
       </div>
@@ -887,6 +931,14 @@ footer a:hover { color: var(--accent); }
 </footer>
 
 <script>
+// Conflict figure toggle (wake/sleep hover)
+function showConflictFig(phase) {
+  document.querySelectorAll('.conflict-img-wake').forEach(el => el.classList.toggle('active', phase === 'wake'));
+  document.querySelectorAll('.conflict-img-sleep').forEach(el => el.classList.toggle('active', phase === 'sleep'));
+  const label = document.querySelector('.conflict-fig-label');
+  if (label) label.style.opacity = '0';
+}
+
 // Theme toggle with localStorage
 function toggleTheme() {
   const html = document.documentElement;
